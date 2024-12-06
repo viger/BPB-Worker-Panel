@@ -6,8 +6,8 @@ export async function getDataset(request, env) {
     let proxySettings, warpConfigs;
 
     try {
-        proxySettings = await env.bpb.get("proxySettings", {type: 'json'});
-        warpConfigs = await env.bpb.get('warpConfigs', {type: 'json'});
+        proxySettings = await env.blog.get("proxySettings", {type: 'json'});
+        warpConfigs = await env.blog.get('warpConfigs', {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting KV - ${error}`);
@@ -30,13 +30,13 @@ export async function updateDataset (request, env) {
     let currentSettings;
     if (!isReset) {
         try {
-            currentSettings = await env.bpb.get("proxySettings", {type: 'json'});
+            currentSettings = await env.blog.get("proxySettings", {type: 'json'});
         } catch (error) {
             console.log(error);
             throw new Error(`An error occurred while getting current KV settings - ${error}`);
         }
     } else {
-        await env.bpb.delete('warpConfigs');
+        await env.blog.delete('warpConfigs');
         newSettings = null;
     }
 
@@ -115,7 +115,7 @@ export async function updateDataset (request, env) {
     };
 
     try {    
-        await env.bpb.put("proxySettings", JSON.stringify(proxySettings));          
+        await env.blog.put("proxySettings", JSON.stringify(proxySettings));          
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while updating KV - ${error}`);

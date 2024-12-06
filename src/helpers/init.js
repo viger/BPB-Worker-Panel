@@ -9,14 +9,14 @@ export function initializeParams(request, env) {
     globalThis.defaultHttpsPorts = ['443', '8443', '2053', '2083', '2087', '2096'];
     globalThis.userID = env.UUID;
     globalThis.trojanPassword = env.TROJAN_PASS;
-    globalThis.proxyIP = proxyIPs ? proxyIPs[Math.floor(Math.random() * proxyIPs.length)] : 'bpb.yousef.isegaro.com';
+    globalThis.proxyIP = proxyIPs ? proxyIPs[Math.floor(Math.random() * proxyIPs.length)] : 'blog.yousef.isegaro.com';
     globalThis.hostName = request.headers.get('Host');
     globalThis.pathName = url.pathname;
     globalThis.client = searchParams.get('app');
     globalThis.urlOrigin = url.origin;
     globalThis.dohURL = env.DOH_URL || 'https://cloudflare-dns.com/dns-query';
     if (pathName !== '/secrets') {
-        if (typeof env.bpb !== 'object') throw new Error('KV Dataset is not properly set! Please refer to tutorials.', { cause: "init"});
+        if (typeof env.blog !== 'object') throw new Error('KV Dataset is not properly set! Please refer to tutorials.', { cause: "init"});
         if (!userID || !trojanPassword) throw new Error(`Please set UUID and Trojan password first. Please go to 🟢 https://${hostName}/secrets 🟢 to generate them.`, { cause: "init"});
         if (userID && !isValidUUID(userID)) throw new Error(`Invalid UUID: ${userID}`, { cause: "init"});
     }
