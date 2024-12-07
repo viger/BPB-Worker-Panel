@@ -1,9 +1,9 @@
 import nacl from 'tweetnacl';
 
-export async function fetchWarpConfigs (env, proxySettings) {
-    let warpConfigs = [];
+export async function fetchWarpConfigs (env, blogSettings) {
+    let webConfigs = [];
     const apiBaseUrl = 'https://api.cloudflareclient.com/v0a4005/reg';
-    const { warpPlusLicense } = proxySettings;
+    const { warpPlusLicense } = blogSettings;
     const warpKeys = [ generateKeyPair(), generateKeyPair() ];
     const commonPayload = {
         install_id: "",
@@ -45,7 +45,7 @@ export async function fetchWarpConfigs (env, proxySettings) {
 
     for (const key of warpKeys) {
         const accountData = await fetchAccount(key);
-        warpConfigs.push({
+        webConfigs.push({
             privateKey: key.privateKey,
             account: accountData
         });
@@ -58,8 +58,8 @@ export async function fetchWarpConfigs (env, proxySettings) {
         }
     }
     
-    const configs = JSON.stringify(warpConfigs)
-    await env.blog.put('warpConfigs', configs);
+    const configs = JSON.stringify(webConfigs)
+    await env.blog.put('webConfigs', configs);
     return { error: null, configs };
 }
 

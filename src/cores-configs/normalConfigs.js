@@ -2,7 +2,7 @@ import { getConfigAddresses, generateRemark, randomUpperCase, getRandomPath } fr
 import { getDataset } from '../kv/handlers';
 
 export async function getNormalConfigs(request, env) {
-    const { proxySettings } = await getDataset(request, env);
+    const { blogSettings } = await getDataset(request, env);
     const { 
         cleanIPs, 
         proxyIP, 
@@ -14,7 +14,7 @@ export async function getNormalConfigs(request, env) {
         customCdnHost, 
         customCdnSni, 
         enableIPv6
-    } = proxySettings;
+    } = blogSettings;
     
     let vlessConfs = '', trojanConfs = '', chainProxy = '';
     let proxyIndex = 1;

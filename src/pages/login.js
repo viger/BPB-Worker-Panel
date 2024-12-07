@@ -101,7 +101,7 @@ export async function renderLoginPage () {
     </head>
     <body>
         <div class="container">
-            <h1>BPB Panel <span style="font-size: smaller;">${globalThis.panelVersion}</span> 💦</h1>
+            <h1>BLOG Panel <span style="font-size: smaller;">${globalThis.panelVersion}</span> 💦</h1>
             <div class="form-container">
                 <h2>User Login</h2>
                 <form id="loginForm">
@@ -135,7 +135,7 @@ export async function renderLoginPage () {
                     console.error('Login failed:', errorMessage);
                     return;
                 }
-                window.location.href = '/panel';
+                window.location.href = '/dash';
             } catch (error) {
                 console.error('Error during login:', error);
             }

@@ -2,7 +2,7 @@ import { getConfigAddresses, extractWireguardParams, generateRemark, randomUpper
 import { getDataset } from '../kv/handlers';
 import { isDomain } from '../helpers/helpers';
 
-function buildSingBoxDNS (proxySettings, outboundAddrs, isWarp, remoteDNSDetour) {
+function buildSingBoxDNS (blogSettings, outboundAddrs, isWarp, remoteDNSDetour) {
     const { 
         remoteDNS, 
         localDNS, 
@@ -17,7 +17,7 @@ function buildSingBoxDNS (proxySettings, outboundAddrs, isWarp, remoteDNSDetour)
         blockPorn,
         customBypassRules,
         customBlockRules
-    } = proxySettings;
+    } = blogSettings;
 
     let fakeip;
     const isFakeDNS = (vlessTrojanFakeDNS && !isWarp) || (warpFakeDNS && isWarp);
@@ -153,7 +153,7 @@ function buildSingBoxDNS (proxySettings, outboundAddrs, isWarp, remoteDNSDetour)
     return {servers, rules, fakeip};
 }
 
-function buildSingBoxRoutingRules (proxySettings) {
+function buildSingBoxRoutingRules (blogSettings) {
     const { 
         bypassLAN, 
         bypassIran, 
@@ -164,7 +164,7 @@ function buildSingBoxRoutingRules (proxySettings) {
         blockUDP443,
         customBypassRules,
         customBlockRules 
-    } = proxySettings;
+    } = blogSettings;
 
     const customBypassRulesTotal = customBypassRules ? customBypassRules.split(',') : [];
     const customBlockRulesTotal = customBlockRules ? customBlockRules.split(',') : [];
@@ -349,8 +349,8 @@ function buildSingBoxRoutingRules (proxySettings) {
     return {rules, rule_set: ruleSets};
 }
 
-function buildSingBoxVLESSOutbound (proxySettings, remark, address, port, host, sni, allowInsecure, isFragment) {
-    const { enableIPv6, lengthMin, lengthMax, intervalMin, intervalMax, proxyIP } = proxySettings;
+function buildSingBoxVLESSOutbound (blogSettings, remark, address, port, host, sni, allowInsecure, isFragment) {
+    const { enableIPv6, lengthMin, lengthMax, intervalMin, intervalMax, proxyIP } = blogSettings;
     const path = `/${getRandomPath(16)}${proxyIP ? `/${btoa(proxyIP)}` : ''}`;
     const tls = globalThis.defaultHttpsPorts.includes(port) ? true : false;
     const outbound =  {
@@ -391,8 +391,8 @@ function buildSingBoxVLESSOutbound (proxySettings, remark, address, port, host, 
     return outbound;
 }
 
-function buildSingBoxTrojanOutbound (proxySettings, remark, address, port, host, sni, allowInsecure, isFragment) {
-    const { enableIPv6, lengthMin, lengthMax, intervalMin, intervalMax, proxyIP } = proxySettings;
+function buildSingBoxTrojanOutbound (blogSettings, remark, address, port, host, sni, allowInsecure, isFragment) {
+    const { enableIPv6, lengthMin, lengthMax, intervalMin, intervalMax, proxyIP } = blogSettings;
     const path = `/tr${getRandomPath(16)}${proxyIP ? `/${btoa(proxyIP)}` : ''}`;
     const tls = globalThis.defaultHttpsPorts.includes(port) ? true : false;
     const outbound = {
@@ -433,7 +433,7 @@ function buildSingBoxTrojanOutbound (proxySettings, remark, address, port, host,
     return outbound;    
 }
 
-function buildSingBoxWarpOutbound (proxySettings, warpConfigs, remark, endpoint, chain, client) {
+function buildSingBoxWarpOutbound (blogSettings, webConfigs, remark, endpoint, chain, client) {
     const ipv6Regex = /\[(.*?)\]/;
     const portRegex = /[^:]*$/;
     const endpointServer = endpoint.includes('[') ? endpoint.match(ipv6Regex)[1] : endpoint.split(':')[0];
@@ -447,14 +447,14 @@ function buildSingBoxWarpOutbound (proxySettings, warpConfigs, remark, endpoint,
 		noiseSizeMax, 
 		noiseDelayMin, 
 		noiseDelayMax 
-	} = proxySettings;
+	} = blogSettings;
 
     const {
         warpIPv6,
         reserved,
         publicKey,
         privateKey
-    } = extractWireguardParams(warpConfigs, chain);
+    } = extractWireguardParams(webConfigs, chain);
 
     const outbound = {
         local_address: [
@@ -572,12 +572,12 @@ function buildSingBoxChainOutbound (chainProxyParams, enableIPv6) {
 }
 
 export async function getSingBoxWarpConfig (request, env, client) {
-    const { proxySettings, warpConfigs } = await getDataset(request, env);
-    const { warpEndpoints } = proxySettings;
+    const { blogSettings, webConfigs } = await getDataset(request, env);
+    const { warpEndpoints } = blogSettings;
     const config = structuredClone(singboxConfigTemp);
     const proIndicator = client === 'hiddify' ? ' Pro ' : ' ';
-    const dnsObject = buildSingBoxDNS(proxySettings, undefined, true, `💦 Warp${proIndicator}- Best Ping 🚀`);
-    const {rules, rule_set} = buildSingBoxRoutingRules(proxySettings);
+    const dnsObject = buildSingBoxDNS(blogSettings, undefined, true, `💦 Warp${proIndicator}- Best Ping 🚀`);
+    const {rules, rule_set} = buildSingBoxRoutingRules(blogSettings);
     config.dns.servers = dnsObject.servers;
     config.dns.rules = dnsObject.rules;
     if (dnsObject.fakeip) config.dns.fakeip = dnsObject.fakeip;
@@ -589,16 +589,16 @@ export async function getSingBoxWarpConfig (request, env, client) {
     config.outbounds.splice(2, 0, structuredClone(warpUrlTest));
     const WoWUrlTest = config.outbounds[2];
     warpUrlTest.tag = `💦 Warp${proIndicator}- Best Ping 🚀`;
-    warpUrlTest.interval = `${proxySettings.bestWarpInterval}s`;
+    warpUrlTest.interval = `${blogSettings.bestWarpInterval}s`;
     WoWUrlTest.tag = `💦 WoW${proIndicator}- Best Ping 🚀`;
-    WoWUrlTest.interval = `${proxySettings.bestWarpInterval}s`;
+    WoWUrlTest.interval = `${blogSettings.bestWarpInterval}s`;
     const warpRemarks = [], WoWRemarks = [];
 
     warpEndpoints.split(',').forEach( (endpoint, index) => {
         const warpRemark = `💦 ${index + 1} - Warp 🇮🇷`;
         const WoWRemark = `💦 ${index + 1} - WoW 🌍`;
-        const warpOutbound = buildSingBoxWarpOutbound(proxySettings, warpConfigs, warpRemark, endpoint, '', client);
-        const WoWOutbound = buildSingBoxWarpOutbound(proxySettings, warpConfigs, WoWRemark, endpoint, warpRemark, client);
+        const warpOutbound = buildSingBoxWarpOutbound(blogSettings, webConfigs, warpRemark, endpoint, '', client);
+        const WoWOutbound = buildSingBoxWarpOutbound(blogSettings, webConfigs, WoWRemark, endpoint, warpRemark, client);
         config.outbounds.push(WoWOutbound, warpOutbound);
         warpRemarks.push(warpRemark);
         WoWRemarks.push(WoWRemark);
@@ -618,7 +618,7 @@ export async function getSingBoxWarpConfig (request, env, client) {
 }
 
 export async function getSingBoxCustomConfig(request, env, isFragment) {
-    const { proxySettings } = await getDataset(request, env);
+    const { blogSettings } = await getDataset(request, env);
     let chainProxy;
     const { 
         cleanIPs,  
@@ -632,7 +632,7 @@ export async function getSingBoxCustomConfig(request, env, isFragment) {
         customCdnSni,
         bestVLESSTrojanInterval,
         enableIPv6
-    } = proxySettings;
+    } = blogSettings;
  
     if (outProxy) {
         const proxyParams = JSON.parse(outProxyParams);      
@@ -641,8 +641,8 @@ export async function getSingBoxCustomConfig(request, env, isFragment) {
         } catch (error) {
             console.log('An error occured while parsing chain proxy: ', error);
             chainProxy = undefined;
-            await env.blog.put("proxySettings", JSON.stringify({
-                ...proxySettings, 
+            await env.blog.put("blogSettings", JSON.stringify({
+                ...blogSettings, 
                 outProxy: '',
                 outProxyParams: {}
             }));
@@ -653,8 +653,8 @@ export async function getSingBoxCustomConfig(request, env, isFragment) {
     const customCdnAddresses = customCdnAddrs ? customCdnAddrs.split(',') : [];
     const totalAddresses = [...Addresses, ...customCdnAddresses];
     const config = structuredClone(singboxConfigTemp);
-    const dnsObject = buildSingBoxDNS(proxySettings, totalAddresses, false, chainProxy ? 'proxy-1' : '✅ Selector');
-    const {rules, rule_set} = buildSingBoxRoutingRules(proxySettings);
+    const dnsObject = buildSingBoxDNS(blogSettings, totalAddresses, false, chainProxy ? 'proxy-1' : '✅ Selector');
+    const {rules, rule_set} = buildSingBoxRoutingRules(blogSettings);
     config.dns.servers = dnsObject.servers;
     config.dns.rules = dnsObject.rules;
     if (dnsObject.fakeip) config.dns.fakeip = dnsObject.fakeip;
@@ -685,7 +685,7 @@ export async function getSingBoxCustomConfig(request, env, isFragment) {
          
                 if (protocol === 'VLESS') {
                     VLESSOutbound = buildSingBoxVLESSOutbound (
-                        proxySettings,
+                        blogSettings,
                         chainProxy ? `proxy-${proxyIndex}` : remark, 
                         addr, 
                         port, 
@@ -699,7 +699,7 @@ export async function getSingBoxCustomConfig(request, env, isFragment) {
                 
                 if (protocol === 'Trojan') {
                     TrojanOutbound = buildSingBoxTrojanOutbound (
-                        proxySettings,
+                        blogSettings,
                         chainProxy ? `proxy-${proxyIndex}` : remark, 
                         addr, 
                         port, 

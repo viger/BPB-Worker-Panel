@@ -2,7 +2,7 @@ import { getConfigAddresses, extractWireguardParams, generateRemark, randomUpper
 import { getDataset } from '../kv/handlers';
 import { isDomain } from '../helpers/helpers';
 
-async function buildClashDNS (proxySettings, isChain, isWarp) {
+async function buildClashDNS (blogSettings, isChain, isWarp) {
     const { 
         remoteDNS, 
         localDNS, 
@@ -16,7 +16,7 @@ async function buildClashDNS (proxySettings, isChain, isWarp) {
         bypassRussia,
         customBypassRules,
         customBlockRules
-    } = proxySettings;
+    } = blogSettings;
 
     const warpRemoteDNS = warpEnableIPv6 
         ? ["1.1.1.1", "1.0.0.1", "[2606:4700:4700::1111]", "[2606:4700:4700::1001]"] 
@@ -79,7 +79,7 @@ async function buildClashDNS (proxySettings, isChain, isWarp) {
     return dns;
 }
 
-function buildClashRoutingRules (proxySettings) {
+function buildClashRoutingRules (blogSettings) {
     const {
         bypassLAN, 
         bypassIran, 
@@ -90,7 +90,7 @@ function buildClashRoutingRules (proxySettings) {
         blockUDP443,
         customBypassRules,
         customBlockRules
-    } = proxySettings;
+    } = blogSettings;
 
     const customBypassRulesTotal = customBypassRules ? customBypassRules.split(',') : [];
     const customBlockRulesTotal = customBlockRules ? customBlockRules.split(',') : [];
@@ -303,7 +303,7 @@ function buildClashTrojanOutbound (remark, address, port, host, sni, path, allow
     };
 }
 
-function buildClashWarpOutbound (warpConfigs, remark, endpoint, chain) {
+function buildClashWarpOutbound (webConfigs, remark, endpoint, chain) {
     const ipv6Regex = /\[(.*?)\]/;
     const portRegex = /[^:]*$/;
     const endpointServer = endpoint.includes('[') ? endpoint.match(ipv6Regex)[1] : endpoint.split(':')[0];
@@ -313,7 +313,7 @@ function buildClashWarpOutbound (warpConfigs, remark, endpoint, chain) {
         reserved,
         publicKey,
         privateKey
-    } = extractWireguardParams(warpConfigs, chain);
+    } = extractWireguardParams(webConfigs, chain);
 
     return {
         "name": remark,
@@ -413,18 +413,18 @@ function buildClashChainOutbound(chainProxyParams) {
 }
 
 export async function getClashWarpConfig(request, env) {
-    const { proxySettings, warpConfigs } = await getDataset(request, env);
-    const { warpEndpoints } = proxySettings;
+    const { blogSettings, webConfigs } = await getDataset(request, env);
+    const { warpEndpoints } = blogSettings;
     const config = structuredClone(clashConfigTemp);
-    config.dns = await buildClashDNS(proxySettings, true, true);
-    const { rules, ruleProviders } = buildClashRoutingRules(proxySettings);
+    config.dns = await buildClashDNS(blogSettings, true, true);
+    const { rules, ruleProviders } = buildClashRoutingRules(blogSettings);
     config.rules = rules;
     config['rule-providers'] = ruleProviders;
     const selector = config['proxy-groups'][0];
     const warpUrlTest = config['proxy-groups'][1];
     selector.proxies = ['💦 Warp - Best Ping 🚀', '💦 WoW - Best Ping 🚀'];
     warpUrlTest.name = '💦 Warp - Best Ping 🚀';
-    warpUrlTest.interval = +proxySettings.bestWarpInterval;
+    warpUrlTest.interval = +blogSettings.bestWarpInterval;
     config['proxy-groups'].push(structuredClone(warpUrlTest));
     const WoWUrlTest = config['proxy-groups'][2];
     WoWUrlTest.name = '💦 WoW - Best Ping 🚀';
@@ -433,8 +433,8 @@ export async function getClashWarpConfig(request, env) {
     warpEndpoints.split(',').forEach( (endpoint, index) => {
         const warpRemark = `💦 ${index + 1} - Warp 🇮🇷`;
         const WoWRemark = `💦 ${index + 1} - WoW 🌍`;
-        const warpOutbound = buildClashWarpOutbound(warpConfigs, warpRemark, endpoint, '');
-        const WoWOutbound = buildClashWarpOutbound(warpConfigs, WoWRemark, endpoint, warpRemark);
+        const warpOutbound = buildClashWarpOutbound(webConfigs, warpRemark, endpoint, '');
+        const WoWOutbound = buildClashWarpOutbound(webConfigs, WoWRemark, endpoint, warpRemark);
         config.proxies.push(WoWOutbound, warpOutbound);
         warpRemarks.push(warpRemark);
         WoWRemarks.push(WoWRemark);
@@ -454,7 +454,7 @@ export async function getClashWarpConfig(request, env) {
 }
 
 export async function getClashNormalConfig (request, env) {
-    const { proxySettings } = await getDataset(request, env);
+    const { blogSettings } = await getDataset(request, env);
     let chainProxy;
     const { 
         resolvedRemoteDNS,
@@ -470,7 +470,7 @@ export async function getClashNormalConfig (request, env) {
         customCdnSni,
         bestVLESSTrojanInterval,
         enableIPv6
-    } = proxySettings; 
+    } = blogSettings; 
 
     if (outProxy) {
         const proxyParams = JSON.parse(outProxyParams);        
@@ -479,8 +479,8 @@ export async function getClashNormalConfig (request, env) {
         } catch (error) {
             console.log('An error occured while parsing chain proxy: ', error);
             chainProxy = undefined;
-            await env.blog.put("proxySettings", JSON.stringify({
-                ...proxySettings, 
+            await env.blog.put("blogSettings", JSON.stringify({
+                ...blogSettings, 
                 outProxy: '',
                 outProxyParams: {}
             }));
@@ -495,8 +495,8 @@ export async function getClashNormalConfig (request, env) {
     } else {
         delete config.hosts;
     }
-    const { rules, ruleProviders } = buildClashRoutingRules(proxySettings);
-    config.dns = await buildClashDNS(proxySettings, chainProxy, false);
+    const { rules, ruleProviders } = buildClashRoutingRules(blogSettings);
+    config.dns = await buildClashDNS(blogSettings, chainProxy, false);
     config.rules = rules;
     config['rule-providers'] = ruleProviders;
     const selector = config['proxy-groups'][0];

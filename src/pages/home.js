@@ -1,4 +1,4 @@
-export async function renderHomePage (proxySettings, isPassSet) {
+export async function renderHomePage (blogSettings, isPassSet) {
     const {
         remoteDNS, 
         localDNS,
@@ -41,7 +41,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
         blockUDP443,
         customBypassRules,
         customBlockRules
-    } = proxySettings;
+    } = blogSettings;
 
     const isWarpPlus = warpPlusLicense ? true : false;
     const activeProtocols = (vlessConfigs ? 1 : 0) + (trojanConfigs ? 1 : 0);
@@ -88,7 +88,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="timestamp" content=${Date.now()}>
-        <title>BPB Panel ${globalThis.panelVersion}</title>
+        <title>BLOG Panel ${globalThis.panelVersion}</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <title>Collapsible Sections</title>
@@ -386,7 +386,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
         </style>
     </head>
     <body>
-        <h1>BPB Panel <span style="font-size: smaller;">${globalThis.panelVersion}</span> 💦</h1>
+        <h1>BLOG Panel <span style="font-size: smaller;">${globalThis.panelVersion}</span> 💦</h1>
         <div class="form-container">
             <form id="configForm">
                 <details open>
@@ -681,8 +681,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['v2rayNG', 'NikaNG', 'MahsaNG', 'v2rayN', 'v2rayN-PRO', 'Shadowrocket', 'Streisand', 'Hiddify', 'Nekoray (Xray)'])}
                         </td>
                         <td>
-                            ${subQR('sub', '', 'BPB-Normal', 'Normal Subscription')}
-                            ${subURL('sub', '', 'BPB-Normal')}
+                            ${subQR('sub', '', 'BLOG-Normal', 'Normal Subscription')}
+                            ${subURL('sub', '', 'BLOG-Normal')}
                         </td>
                     </tr>
                     <tr>
@@ -690,7 +690,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['husi', 'Nekobox', 'Nekoray (sing-Box)', 'Karing'])}
                         </td>
                         <td>
-                            ${subURL('sub', 'singbox', 'BPB-Normal')}
+                            ${subURL('sub', 'singbox', 'BLOG-Normal')}
                         </td>
                     </tr>
                 </table>
@@ -707,8 +707,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['v2rayNG', 'NikaNG', 'MahsaNG', 'v2rayN', 'v2rayN-PRO', 'Streisand'])}
                         </td>
                         <td>
-                            ${subQR('sub', 'xray', 'BPB-Full-Normal', 'Full normal Subscription')}
-                            ${subURL('sub', 'xray', 'BPB-Full-Normal')}
+                            ${subQR('sub', 'xray', 'BLOG-Full-Normal', 'Full normal Subscription')}
+                            ${subURL('sub', 'xray', 'BLOG-Full-Normal')}
                         </td>
                     </tr>
                     <tr>
@@ -716,8 +716,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['sing-box', 'v2rayN (sing-box)'])}
                         </td>
                         <td>
-                            ${subQR('sub', 'sfa', 'BPB-Full-Normal', 'Full normal Subscription', true)}
-                            ${subURL('sub', 'sfa', 'BPB-Full-Normal')}
+                            ${subQR('sub', 'sfa', 'BLOG-Full-Normal', 'Full normal Subscription', true)}
+                            ${subURL('sub', 'sfa', 'BLOG-Full-Normal')}
                         </td>
                     </tr>
                     <tr>
@@ -725,8 +725,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['Clash Meta', 'Clash Verge', 'FlClash', 'Stash', 'v2rayN (mihomo)'])}
                         </td>
                         <td>
-                            ${subQR('sub', 'clash', 'BPB-Full-Normal', 'Full normal Subscription')}
-                            ${subURL('sub', 'clash', 'BPB-Full-Normal')}
+                            ${subQR('sub', 'clash', 'BLOG-Full-Normal', 'Full normal Subscription')}
+                            ${subURL('sub', 'clash', 'BLOG-Full-Normal')}
                         </td>
                     </tr>
                 </table>
@@ -743,8 +743,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['v2rayNG', 'NikaNG', 'MahsaNG', 'v2rayN', 'v2rayN-PRO', 'Streisand'])}
                         </td>
                         <td>
-                            ${subQR('fragsub', '', 'BPB-Fragment', 'Fragment Subscription')}
-                            ${subURL('fragsub', '', 'BPB-Fragment')}
+                            ${subQR('fragsub', '', 'BLOG-Fragment', 'Fragment Subscription')}
+                            ${subURL('fragsub', '', 'BLOG-Fragment')}
                         </td>
                     </tr>
                     <tr>
@@ -752,8 +752,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['Hiddify'])}
                         </td>
                         <td>
-                            ${subQR('fragsub', 'hiddify', 'BPB-Fragment', 'Fragment Subscription')}
-                            ${subURL('fragsub', 'hiddify', 'BPB-Fragment')}
+                            ${subQR('fragsub', 'hiddify', 'BLOG-Fragment', 'Fragment Subscription')}
+                            ${subURL('fragsub', 'hiddify', 'BLOG-Fragment')}
                         </td>
                     </tr>
                 </table>
@@ -770,8 +770,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['v2rayNG', 'v2rayN', 'Streisand'])}
                         </td>
                         <td>
-                            ${subQR('warpsub', 'xray', 'BPB-Warp', 'Warp Subscription')}
-                            ${subURL('warpsub', 'xray', 'BPB-Warp')}
+                            ${subQR('warpsub', 'xray', 'BLOG-Warp', 'Warp Subscription')}
+                            ${subURL('warpsub', 'xray', 'BLOG-Warp')}
                         </td>
                     </tr>
                     <tr>
@@ -779,8 +779,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['Hiddify', 'sing-box', 'v2rayN (sing-box)'])}
                         </td>
                         <td>
-                            ${subQR('sub', 'singbox', 'BPB-Warp', 'Warp Subscription', true)}
-                            ${subURL('warpsub', 'singbox', 'BPB-Warp')}
+                            ${subQR('sub', 'singbox', 'BLOG-Warp', 'Warp Subscription', true)}
+                            ${subURL('warpsub', 'singbox', 'BLOG-Warp')}
                         </td>
                     </tr>
                     <tr>
@@ -788,8 +788,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['Clash Meta', 'Clash Verge', 'FlClash', 'Stash', 'v2rayN (mihomo)'])}
                         </td>
                         <td>
-                            ${subQR('warpsub', 'clash', 'BPB-Warp', 'Warp Subscription')}
-                            ${subURL('warpsub', 'clash', 'BPB-Warp')}
+                            ${subQR('warpsub', 'clash', 'BLOG-Warp', 'Warp Subscription')}
+                            ${subURL('warpsub', 'clash', 'BLOG-Warp')}
                         </td>
                     </tr>
                 </table>
@@ -806,8 +806,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['NikaNG', 'MahsaNG', 'v2rayN-PRO'])}
                         </td>
                         <td>
-                            ${subQR('warpsub', 'nikang', 'BPB-Warp-Pro', 'Warp Pro Subscription')}
-                            ${subURL('warpsub', 'nikang', 'BPB-Warp-Pro')}
+                            ${subQR('warpsub', 'nikang', 'BLOG-Warp-Pro', 'Warp Pro Subscription')}
+                            ${subURL('warpsub', 'nikang', 'BLOG-Warp-Pro')}
                         </td>
                     </tr>
                     <tr>
@@ -815,8 +815,8 @@ export async function renderHomePage (proxySettings, isPassSet) {
                             ${supportedApps(['Hiddify'])}
                         </td>
                         <td>
-                            ${subQR('warpsub', 'hiddify', 'BPB-Warp-Pro', 'Warp Pro Subscription', true)}
-                            ${subURL('warpsub', 'hiddify', 'BPB-Warp-Pro')}
+                            ${subQR('warpsub', 'hiddify', 'BLOG-Warp-Pro', 'Warp Pro Subscription', true)}
+                            ${subURL('warpsub', 'hiddify', 'BLOG-Warp-Pro')}
                         </td>
                     </tr>
                 </table>
@@ -976,7 +976,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
                     const refreshButtonVal = refreshBtn.innerHTML;
                     refreshBtn.innerHTML = '⌛ Loading...';
 
-                    const response = await fetch('/panel', {
+                    const response = await fetch('/dash', {
                         method: 'POST',
                         body: formData,
                         credentials: 'include'
@@ -1259,7 +1259,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
                 const applyButtonVal = applyButton.value;
                 applyButton.value = '⌛ Loading...';
 
-                const response = await fetch('/panel', {
+                const response = await fetch('/dash', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include'
@@ -1325,7 +1325,7 @@ export async function renderHomePage (proxySettings, isPassSet) {
             }
                     
             try {
-                const response = await fetch('/panel/password', {
+                const response = await fetch('/dash/password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'text/plain'

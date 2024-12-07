@@ -48,11 +48,11 @@ export async function handlePanel(request, env) {
         return new Response('Success', { status: 200 });
     }
         
-    const { proxySettings } = await getDataset(request, env);
+    const { blogSettings } = await getDataset(request, env);
     const pwd = await env.blog.get('pwd');
     if (pwd && !auth) return Response.redirect(`${globalThis.urlOrigin}/login`, 302);
     const isPassSet = pwd?.length >= 8;
-    return await renderHomePage(proxySettings, isPassSet);
+    return await renderHomePage(blogSettings, isPassSet);
 }
 
 export async function fallback(request) {

@@ -5,7 +5,7 @@
 
 شما میتونید Panel رو با اضافه کردن `panel/` انتهاش مثل زیر ببینید:
 
->`https://worker-polished-leaf-d022.workers.dev/panel`
+>`https://worker-polished-leaf-d022.workers.dev/dash`
 
 
 ازتون میخواد پسورد جدید بذارید و لاگین کنید و تمام.
@@ -177,7 +177,7 @@
 
 >[Proxy IP](https://www.nslookup.io/domains/bpb.yousef.isegaro.com/dns-records/)
 
-یا میتونید از [این آموزش](https://github.com/bia-pain-bache/BPB-Worker-Panel/blob/main/docs/proxy-ip-scanner.md) برای خودتون اسکن کنید. البته در حال حاضر ممکنه اسکنر خوب جواب نده، میتونید امتحان کنید.
+یا میتونید از [این آموزش](https://github.com/bia-pain-bache/BLOG-Worker-Panel/blob/main/docs/proxy-ip-scanner.md) برای خودتون اسکن کنید. البته در حال حاضر ممکنه اسکنر خوب جواب نده، میتونید امتحان کنید.
 
 > [!TIP]
 > اگر خواستید چند Proxy IP داشته باشید میتونید با ویرگول وارد کنید، مثل `151.213.181.145`,`5.163.51.41`,`bpb.yousef.isegaro.com`

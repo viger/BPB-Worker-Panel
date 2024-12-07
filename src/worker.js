@@ -18,7 +18,7 @@ export default {
             const upgradeHeader = request.headers.get('Upgrade');
             if (!upgradeHeader || upgradeHeader !== 'websocket') {            
                 switch (globalThis.pathName) {                    
-                    case '/update-warp':
+                    case '/update-web':
                         return await updateWarpConfigs(request, env);
 
                     case `/sub/${globalThis.userID}`:
@@ -32,12 +32,12 @@ export default {
                             ? await getSingBoxCustomConfig(request, env, true)
                             : await getXrayCustomConfigs(request, env, true);
 
-                    case `/warpsub/${globalThis.userID}`:
+                    case `/websub/${globalThis.userID}`:
                         if (globalThis.client === 'clash') return await getClashWarpConfig(request, env);   
                         if (globalThis.client === 'singbox' || globalThis.client === 'hiddify') return await getSingBoxWarpConfig(request, env, globalThis.client);
                         return await getXrayWarpConfigs(request, env, globalThis.client);
 
-                    case '/panel':
+                    case '/dash':
                         return await handlePanel(request, env);
                                                       
                     case '/login':
@@ -46,7 +46,7 @@ export default {
                     case '/logout':                        
                         return logout();        
 
-                    case '/panel/password':
+                    case '/dash/password':
                         return await resetPassword(request, env);
                     
                     case '/my-ip':

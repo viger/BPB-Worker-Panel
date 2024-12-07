@@ -1,6 +1,6 @@
 <h1 align="center">نصب از طریق Cloudflare Workers</h1>
 
-خب اول کد Worker رو از [اینجا](https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/worker.js) دانلود کنید، بعد ورکری که ساختید رو Edit code بزنید و از سایدبار سمت چپ فایل‌ worker.js رو delete کنید و فایل جدید رو آپلود کنید، اگر ارور داد فایل package-lock.json رو هم پاک کنید. چون کد خیلی زیاد شده Copy Paste کردن با گوشی خیلی سخت شده، با توجه به عکس زیر آپلود کنید. توی مویایل منوی کناری رو باز کنید و تاح کنید روش نگه دارید و آپلود کنید.
+خب اول کد Worker رو از [اینجا](https://github.com/bia-pain-bache/BLOG-Worker-Panel/releases/latest/download/worker.js) دانلود کنید، بعد ورکری که ساختید رو Edit code بزنید و از سایدبار سمت چپ فایل‌ worker.js رو delete کنید و فایل جدید رو آپلود کنید، اگر ارور داد فایل package-lock.json رو هم پاک کنید. چون کد خیلی زیاد شده Copy Paste کردن با گوشی خیلی سخت شده، با توجه به عکس زیر آپلود کنید. توی مویایل منوی کناری رو باز کنید و تاح کنید روش نگه دارید و آپلود کنید.
 
 <p align="center">
   <img src="assets/images/Worker_mobile_upload.jpg">
@@ -36,7 +36,7 @@
 
 برای مثال، فرض کنید دامنه‌ی ورکر شما هست worker-polished-leaf-d022.workers.dev، یه `panel/` تهش اضافه کنید و وارد پنل بشید. مثال:
 
->`https://worker-polished-leaf-d022.workers.dev/panel`
+>`https://worker-polished-leaf-d022.workers.dev/dash`
 
 ازتون میخواد پسورد جدید بذارید و لاگین کنید و تمام.
 نصب به پایان رسیده و توضیحاتی که در ادامه اومده شاید برای عموم لازم نباشه.
@@ -84,7 +84,7 @@
 بعد باید دوباره `Add +` رو بزنید و این بار `Route` رو بزنید، قسمت Zone که دامنه خودتون رو انتخاب میکنید و در قسمت Route باید اینجوری دامنه جدید رو وارد کنید: 
 > `*bpb.com/*`
 
-خب بعد از این میتونید از آدرس `https://xyz.bpb.com/panel` وارد پنلتون بشید و ساب‌های جدید رو دریافت کنید.
+خب بعد از این میتونید از آدرس `https://xyz.bpb.com/dash` وارد پنلتون بشید و ساب‌های جدید رو دریافت کنید.
 
 > [!TIP]
 > 1- اگر به ورکر دامنه وصل کنید مثل Pages ترافیکش نامحدود میشه.

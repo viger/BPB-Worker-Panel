@@ -3,25 +3,25 @@ import { isDomain, resolveDNS } from '../helpers/helpers';
 import { Authenticate } from '../authentication/auth';
 
 export async function getDataset(request, env) {
-    let proxySettings, warpConfigs;
+    let blogSettings, webConfigs;
 
     try {
-        proxySettings = await env.blog.get("proxySettings", {type: 'json'});
-        warpConfigs = await env.blog.get('warpConfigs', {type: 'json'});
+        blogSettings = await env.blog.get("blogSettings", {type: 'json'});
+        webConfigs = await env.blog.get('webConfigs', {type: 'json'});
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while getting KV - ${error}`);
     }
 
-    if (!proxySettings) {
-        proxySettings = await updateDataset(request, env);
-        const { error, configs } = await fetchWarpConfigs(env, proxySettings);
+    if (!blogSettings) {
+        blogSettings = await updateDataset(request, env);
+        const { error, configs } = await fetchWarpConfigs(env, blogSettings);
         if (error) throw new Error(`An error occurred while getting Warp configs - ${error}`);
-        warpConfigs = configs;
+        webConfigs = configs;
     }
     
-    if (globalThis.panelVersion !== proxySettings.panelVersion) proxySettings = await updateDataset(request, env);
-    return { proxySettings, warpConfigs }
+    if (globalThis.panelVersion !== blogSettings.panelVersion) blogSettings = await updateDataset(request, env);
+    return { blogSettings, webConfigs }
 }
 
 export async function updateDataset (request, env) {
@@ -30,13 +30,13 @@ export async function updateDataset (request, env) {
     let currentSettings;
     if (!isReset) {
         try {
-            currentSettings = await env.blog.get("proxySettings", {type: 'json'});
+            currentSettings = await env.blog.get("blogSettings", {type: 'json'});
         } catch (error) {
             console.log(error);
             throw new Error(`An error occurred while getting current KV settings - ${error}`);
         }
     } else {
-        await env.blog.delete('warpConfigs');
+        await env.blog.delete('webConfigs');
         newSettings = null;
     }
 
@@ -67,7 +67,7 @@ export async function updateDataset (request, env) {
         }
     } 
 
-    const proxySettings = {
+    const blogSettings = {
         remoteDNS: remoteDNS,
         resolvedRemoteDNS: resolvedRemoteDNS,
         localDNS: validateField('localDNS') ?? currentSettings?.localDNS ?? '8.8.8.8',
@@ -115,13 +115,13 @@ export async function updateDataset (request, env) {
     };
 
     try {    
-        await env.blog.put("proxySettings", JSON.stringify(proxySettings));          
+        await env.blog.put("blogSettings", JSON.stringify(blogSettings));          
     } catch (error) {
         console.log(error);
         throw new Error(`An error occurred while updating KV - ${error}`);
     }
 
-    return proxySettings;
+    return blogSettings;
 }
 
 function extractChainProxyParams(chainProxy) {
@@ -159,8 +159,8 @@ export async function updateWarpConfigs(request, env) {
     if (!auth) return new Response('Unauthorized', { status: 401 });
     if (request.method === 'POST') {
         try {
-            const { proxySettings } = await getDataset(request, env);
-            const { error: warpPlusError } = await fetchWarpConfigs(env, proxySettings);
+            const { blogSettings } = await getDataset(request, env);
+            const { error: warpPlusError } = await fetchWarpConfigs(env, blogSettings);
             if (warpPlusError) return new Response(warpPlusError, { status: 400 });
             return new Response('Warp configs updated successfully', { status: 200 });
         } catch (error) {

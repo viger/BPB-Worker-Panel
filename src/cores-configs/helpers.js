@@ -12,14 +12,14 @@ export async function getConfigAddresses(cleanIPs, enableIPv6) {
     ];
 }
 
-export function extractWireguardParams(warpConfigs, isWoW) {
+export function extractWireguardParams(webConfigs, isWoW) {
     const index = isWoW ? 1 : 0;
-    const warpConfig = warpConfigs[index].account.config;
+    const warpConfig = webConfigs[index].account.config;
     return {
         warpIPv6: `${warpConfig.interface.addresses.v6}/128`,
         reserved: warpConfig.client_id,
         publicKey: warpConfig.peers[0].public_key,
-        privateKey: warpConfigs[index].privateKey,
+        privateKey: webConfigs[index].privateKey,
     };
 }
 

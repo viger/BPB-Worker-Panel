@@ -2,7 +2,7 @@ import { resolveDNS, isDomain } from '../helpers/helpers';
 import { getConfigAddresses, extractWireguardParams, base64ToDecimal, generateRemark, randomUpperCase, getRandomPath } from './helpers';
 import { getDataset } from '../kv/handlers';
 
-async function buildXrayDNS (proxySettings, outboundAddrs, domainToStaticIPs, isWorkerLess, isWarp) { 
+async function buildXrayDNS (blogSettings, outboundAddrs, domainToStaticIPs, isWorkerLess, isWarp) { 
     const { 
         remoteDNS, 
         resolvedRemoteDNS, 
@@ -18,7 +18,7 @@ async function buildXrayDNS (proxySettings, outboundAddrs, domainToStaticIPs, is
         bypassRussia,
         customBypassRules,
         customBlockRules
-    } = proxySettings;
+    } = blogSettings;
 
     const bypassRules = [
         { rule: bypassIran, domain: "geosite:category-ir", ip: "geoip:ir" },
@@ -119,7 +119,7 @@ async function buildXrayDNS (proxySettings, outboundAddrs, domainToStaticIPs, is
     return dnsObject;
 }
 
-function buildXrayRoutingRules (proxySettings, outboundAddrs, isChain, isBalancer, isWorkerLess, isWarp) {
+function buildXrayRoutingRules (blogSettings, outboundAddrs, isChain, isBalancer, isWorkerLess, isWarp) {
     const {
         remoteDNS,
         localDNS,
@@ -132,7 +132,7 @@ function buildXrayRoutingRules (proxySettings, outboundAddrs, isChain, isBalance
         blockUDP443,
         customBypassRules,
         customBlockRules 
-    } = proxySettings;
+    } = blogSettings;
 
     const geoRules = [ 
         { rule: bypassLAN, type: 'direct', domain: "geosite:private", ip: "geoip:private" },
@@ -378,7 +378,7 @@ function buildXrayTrojanOutbound (tag, address, port, host, sni, proxyIP, isFrag
     return outbound;
 }
 
-function buildXrayWarpOutbound (proxySettings, warpConfigs, endpoint, isChain, client) {
+function buildXrayWarpOutbound (blogSettings, webConfigs, endpoint, isChain, client) {
     const { 
         warpEnableIPv6,
 		nikaNGNoiseMode,  
@@ -388,14 +388,14 @@ function buildXrayWarpOutbound (proxySettings, warpConfigs, endpoint, isChain, c
 		noiseSizeMax, 
 		noiseDelayMin, 
 		noiseDelayMax 
-	} = proxySettings;
+	} = blogSettings;
 
     const {
         warpIPv6,
         reserved,
         publicKey,
         privateKey
-    } = extractWireguardParams(warpConfigs, isChain);
+    } = extractWireguardParams(webConfigs, isChain);
 
     const outbound = {
         protocol: "wireguard",
@@ -597,7 +597,7 @@ function buildXrayChainOutbound(chainProxyParams, enableIPv6) {
     return proxyOutbound;
 }
 
-function buildXrayConfig (proxySettings, remark, isFragment, isBalancer, isChain, balancerFallback, isWarp) {
+function buildXrayConfig (blogSettings, remark, isFragment, isBalancer, isChain, balancerFallback, isWarp) {
     const { 
         vlessTrojanFakeDNS, 
         enableIPv6, 
@@ -609,7 +609,7 @@ function buildXrayConfig (proxySettings, remark, isFragment, isBalancer, isChain
         intervalMin, 
         intervalMax, 
         fragmentPackets 
-    } = proxySettings;
+    } = blogSettings;
 
     const isFakeDNS = (vlessTrojanFakeDNS && !isWarp) || (warpFakeDNS && isWarp);
     const config = structuredClone(xrayConfigTemp);
@@ -648,24 +648,24 @@ function buildXrayConfig (proxySettings, remark, isFragment, isBalancer, isChain
     return config;
 }
 
-async function buildXrayBestPingConfig(proxySettings, totalAddresses, chainProxy, outbounds, isFragment) {
-    const remark = isFragment ? '💦 BPB F - Best Ping 💥' : '💦 BPB - Best Ping 💥';
-    const config = buildXrayConfig(proxySettings, remark, isFragment, true, chainProxy, true);
-    config.dns = await buildXrayDNS(proxySettings, totalAddresses, undefined, false, false);
-    config.routing.rules = buildXrayRoutingRules(proxySettings, totalAddresses, chainProxy, true, false, false);
+async function buildXrayBestPingConfig(blogSettings, totalAddresses, chainProxy, outbounds, isFragment) {
+    const remark = isFragment ? '💦 BLOG F - Best Ping 💥' : '💦 BLOG - Best Ping 💥';
+    const config = buildXrayConfig(blogSettings, remark, isFragment, true, chainProxy, true);
+    config.dns = await buildXrayDNS(blogSettings, totalAddresses, undefined, false, false);
+    config.routing.rules = buildXrayRoutingRules(blogSettings, totalAddresses, chainProxy, true, false, false);
     config.outbounds.unshift(...outbounds);
 
     return config;
 }
 
-async function buildXrayBestFragmentConfig(proxySettings, hostName, chainProxy, outbounds) {
+async function buildXrayBestFragmentConfig(blogSettings, hostName, chainProxy, outbounds) {
     const bestFragValues = ['10-20', '20-30', '30-40', '40-50', '50-60', '60-70', 
                             '70-80', '80-90', '90-100', '10-30', '20-40', '30-50', 
                             '40-60', '50-70', '60-80', '70-90', '80-100', '100-200'];
 
-    const config = buildXrayConfig(proxySettings, '💦 BPB F - Best Fragment 😎', true, true, chainProxy, false, false);
-    config.dns = await buildXrayDNS(proxySettings, [], hostName, false, false);
-    config.routing.rules = buildXrayRoutingRules(proxySettings, [], chainProxy, true, false, false);
+    const config = buildXrayConfig(blogSettings, '💦 BLOG F - Best Fragment 😎', true, true, chainProxy, false, false);
+    config.dns = await buildXrayDNS(blogSettings, [], hostName, false, false);
+    config.routing.rules = buildXrayRoutingRules(blogSettings, [], chainProxy, true, false, false);
     const fragment = config.outbounds.shift();
     const bestFragOutbounds = [];
     
@@ -691,10 +691,10 @@ async function buildXrayBestFragmentConfig(proxySettings, hostName, chainProxy, 
     return config;
 }
 
-async function buildXrayWorkerLessConfig(proxySettings) {
-    const config = buildXrayConfig(proxySettings, '💦 BPB F - WorkerLess ⭐', true, false, false, false, false);
-    config.dns = await buildXrayDNS(proxySettings, [], undefined, true);
-    config.routing.rules = buildXrayRoutingRules(proxySettings, [], false, false, true, false);
+async function buildXrayWorkerLessConfig(blogSettings) {
+    const config = buildXrayConfig(blogSettings, '💦 BLOG F - WorkerLess ⭐', true, false, false, false, false);
+    config.dns = await buildXrayDNS(blogSettings, [], undefined, true);
+    config.routing.rules = buildXrayRoutingRules(blogSettings, [], false, false, true, false);
     const fakeOutbound = buildXrayVLESSOutbound('fake-outbound', 'google.com', '443', globalThis.userID, 'google.com', 'google.com', '', true, false);
     delete fakeOutbound.streamSettings.sockopt;
     fakeOutbound.streamSettings.wsSettings.path = '/';
@@ -703,7 +703,7 @@ async function buildXrayWorkerLessConfig(proxySettings) {
 }
 
 export async function getXrayCustomConfigs(request, env, isFragment) {
-    const { proxySettings } = await getDataset(request, env);
+    const { blogSettings } = await getDataset(request, env);
     let configs = [];
     let outbounds = [];
     let protocols = [];
@@ -720,7 +720,7 @@ export async function getXrayCustomConfigs(request, env, isFragment) {
         vlessConfigs,
         trojanConfigs,
         ports
-    } = proxySettings;
+    } = blogSettings;
 
     if (outProxy) {
         const proxyParams = JSON.parse(outProxyParams);
@@ -729,8 +729,8 @@ export async function getXrayCustomConfigs(request, env, isFragment) {
         } catch (error) {
             console.log('An error occured while parsing chain proxy: ', error);
             chainProxy = undefined;
-            await env.blog.put("proxySettings", JSON.stringify({
-                ...proxySettings, 
+            await env.blog.put("blogSettings", JSON.stringify({
+                ...blogSettings, 
                 outProxy: '',
                 outProxyParams: {}
             }));
@@ -754,9 +754,9 @@ export async function getXrayCustomConfigs(request, env, isFragment) {
                 const sni = isCustomAddr ? customCdnSni : randomUpperCase(globalThis.hostName);
                 const host = isCustomAddr ? customCdnHost : globalThis.hostName;
                 const remark = generateRemark(protocolIndex, port, addr, cleanIPs, protocol, configType);
-                const customConfig = buildXrayConfig(proxySettings, remark, isFragment, false, chainProxy, false, false);
-                customConfig.dns = await buildXrayDNS(proxySettings, [addr], undefined);
-                customConfig.routing.rules = buildXrayRoutingRules(proxySettings, [addr], chainProxy, false, false, false);
+                const customConfig = buildXrayConfig(blogSettings, remark, isFragment, false, chainProxy, false, false);
+                customConfig.dns = await buildXrayDNS(blogSettings, [addr], undefined);
+                customConfig.routing.rules = buildXrayRoutingRules(blogSettings, [addr], chainProxy, false, false, false);
                 const outbound = protocol === 'VLESS'
                     ? buildXrayVLESSOutbound('proxy', addr, port, host, sni, proxyIP, isFragment, isCustomAddr, enableIPv6)
                     : buildXrayTrojanOutbound('proxy', addr, port, host, sni, proxyIP, isFragment, isCustomAddr, enableIPv6);
@@ -780,11 +780,11 @@ export async function getXrayCustomConfigs(request, env, isFragment) {
         }
     }
     
-    const bestPing = await buildXrayBestPingConfig(proxySettings, totalAddresses, chainProxy, outbounds, isFragment);
+    const bestPing = await buildXrayBestPingConfig(blogSettings, totalAddresses, chainProxy, outbounds, isFragment);
     const finalConfigs = [...configs, bestPing];
     if (isFragment) {
-        const bestFragment = await buildXrayBestFragmentConfig(proxySettings, globalThis.hostName, chainProxy, outbounds);
-        const workerLessConfig = await buildXrayWorkerLessConfig(proxySettings); 
+        const bestFragment = await buildXrayBestFragmentConfig(blogSettings, globalThis.hostName, chainProxy, outbounds);
+        const workerLessConfig = await buildXrayWorkerLessConfig(blogSettings); 
         finalConfigs.push(bestFragment, workerLessConfig);
     }
     return new Response(JSON.stringify(finalConfigs, null, 4), { 
@@ -798,24 +798,24 @@ export async function getXrayCustomConfigs(request, env, isFragment) {
 }
 
 export async function getXrayWarpConfigs (request, env, client) {
-    const { proxySettings, warpConfigs } = await getDataset(request, env);
+    const { blogSettings, webConfigs } = await getDataset(request, env);
     const xrayWarpConfigs = [];
     const xrayWoWConfigs = [];
     const xrayWarpOutbounds = [];
     const xrayWoWOutbounds = [];
-    const { warpEndpoints } = proxySettings;
+    const { warpEndpoints } = blogSettings;
     const outboundDomains = warpEndpoints.split(',').map(endpoint => endpoint.split(':')[0]).filter(address => isDomain(address));
     const proIndicator = client === 'nikang' ? ' Pro ' : ' ';
     
     for (const [index, endpoint] of warpEndpoints.split(',').entries()) {
         const endpointHost = endpoint.split(':')[0];
-        const warpConfig = buildXrayConfig(proxySettings, `💦 ${index + 1} - Warp${proIndicator}🇮🇷`, false, false, false, false, true);
-        const WoWConfig = buildXrayConfig(proxySettings, `💦 ${index + 1} - WoW${proIndicator}🌍`, false, false, true, false, true);
-        warpConfig.dns = WoWConfig.dns = await buildXrayDNS(proxySettings, [endpointHost], undefined, false, true);    
-        warpConfig.routing.rules = buildXrayRoutingRules(proxySettings, [endpointHost], false, false, false, true);
-        WoWConfig.routing.rules = buildXrayRoutingRules(proxySettings, [endpointHost], true, false, false, true);
-        const warpOutbound = buildXrayWarpOutbound(proxySettings, warpConfigs, endpoint, false, client);
-        const WoWOutbound = buildXrayWarpOutbound(proxySettings, warpConfigs, endpoint, true, client);
+        const warpConfig = buildXrayConfig(blogSettings, `💦 ${index + 1} - Warp${proIndicator}🇮🇷`, false, false, false, false, true);
+        const WoWConfig = buildXrayConfig(blogSettings, `💦 ${index + 1} - WoW${proIndicator}🌍`, false, false, true, false, true);
+        warpConfig.dns = WoWConfig.dns = await buildXrayDNS(blogSettings, [endpointHost], undefined, false, true);    
+        warpConfig.routing.rules = buildXrayRoutingRules(blogSettings, [endpointHost], false, false, false, true);
+        WoWConfig.routing.rules = buildXrayRoutingRules(blogSettings, [endpointHost], true, false, false, true);
+        const warpOutbound = buildXrayWarpOutbound(blogSettings, webConfigs, endpoint, false, client);
+        const WoWOutbound = buildXrayWarpOutbound(blogSettings, webConfigs, endpoint, true, client);
         warpConfig.outbounds.unshift(warpOutbound);
         WoWConfig.outbounds.unshift(WoWOutbound, warpOutbound);
         xrayWarpConfigs.push(warpConfig);
@@ -829,14 +829,14 @@ export async function getXrayWarpConfigs (request, env, client) {
         xrayWoWOutbounds.push(chainOutbound);
     }
 
-    const dnsObject = await buildXrayDNS(proxySettings, outboundDomains, undefined, false, true);
-    const xrayWarpBestPing = buildXrayConfig(proxySettings, `💦 Warp${proIndicator}- Best Ping 🚀`, false, true, false, false, true);
+    const dnsObject = await buildXrayDNS(blogSettings, outboundDomains, undefined, false, true);
+    const xrayWarpBestPing = buildXrayConfig(blogSettings, `💦 Warp${proIndicator}- Best Ping 🚀`, false, true, false, false, true);
     xrayWarpBestPing.dns = dnsObject;    
-    xrayWarpBestPing.routing.rules = buildXrayRoutingRules(proxySettings, outboundDomains, false, true, false, true);
+    xrayWarpBestPing.routing.rules = buildXrayRoutingRules(blogSettings, outboundDomains, false, true, false, true);
     xrayWarpBestPing.outbounds.unshift(...xrayWarpOutbounds);
-    const xrayWoWBestPing = buildXrayConfig(proxySettings, `💦 WoW${proIndicator}- Best Ping 🚀`, false, true, true, false, true);
+    const xrayWoWBestPing = buildXrayConfig(blogSettings, `💦 WoW${proIndicator}- Best Ping 🚀`, false, true, true, false, true);
     xrayWoWBestPing.dns = dnsObject;
-    xrayWoWBestPing.routing.rules = buildXrayRoutingRules(proxySettings, outboundDomains, true, true, false, true);
+    xrayWoWBestPing.routing.rules = buildXrayRoutingRules(blogSettings, outboundDomains, true, true, false, true);
     xrayWoWBestPing.outbounds.unshift(...xrayWoWOutbounds, ...xrayWarpOutbounds);
     const configs = [...xrayWarpConfigs, ...xrayWoWConfigs, xrayWarpBestPing, xrayWoWBestPing];
     return new Response(JSON.stringify(configs, null, 4), { 
